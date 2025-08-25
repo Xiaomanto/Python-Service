@@ -20,6 +20,14 @@
 git clone https://github.com/Xiaomanto/Python-Service.git src
 ```
 
+### 在你的專案根目錄中，安裝環境，請執行它：
+``` bash
+uv init --bare
+uv venv
+source .venv/bin/activate
+mv src/requirements.txt requirements-service.txt
+uv add -r requirements-service.txt
+```
 ## 使用
 
 ### 先在專案主程式或專案跟目錄中建立 config/.env 檔案，並填入以下內容：
