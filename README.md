@@ -33,11 +33,12 @@ uv add -r requirements-service.txt
 ### 先在專案主程式或專案跟目錄中建立 config/.env 檔案，並填入以下內容：
 ``` env
 ########## LLM Config ##########
-LLM_URL=http://10.88.91.72:40033/v1/
+LLM_URL=http://xxx.xxx.xxx.xxx:12345/v1/
 # example LLM_URL=http://xxx.xxx.xxx.xxx:12345/v1/
 
 LLM_TYPE=Company
 # example LLM_TYPE=OpenAI
+# Options: OpenAI, Ollama
 
 LLM_API_KEY=your api key
 # example LLM_API_KEY=sk-proj-xxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxx
