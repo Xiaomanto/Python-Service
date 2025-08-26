@@ -1,4 +1,0 @@
-ollama
-openai
-python-dotenv
-pydantic

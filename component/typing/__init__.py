@@ -53,25 +53,27 @@ class BaseChatService(ABC):
         for message in prompt:
             content = ""
             images = []
-
-            if isinstance(message.content,list):
-                for c in message.content:
-                    if c.type == "image_url":
-                        if c.image_url.url.startswith("http"):
+            promptContent = message.get("content","")
+            if isinstance(promptContent,list):
+                for c in promptContent:
+                    types = c.get("type","")
+                    if types == "image_url":
+                        image_url = c.get("image_url",{"url":""}).get("url","")
+                        if image_url.startswith("http"):
                             print("image url is not base64 encoded or path skipping...")
                             continue
-                        if c.image_url.url.startswith("data:image"):
-                            images.append(c.image_url.url.split(",")[-1])
+                        if image_url.startswith("data:image"):
+                            images.append(image_url.split(",")[-1])
                         else:
-                            images.append(c.image_url.url)
-                    if c.type == "text" and not content:
-                        content = c.text
-                    if c.type == "input_audio":
+                            images.append(image_url)
+                    if types == "text" and not content:
+                        content = c.get("text","")
+                    if types == "input_audio":
                         print("audio not supported skipping...")
             else:
-                content = message.content or ""
-
-            messages.append(Message(role=message.role, content=content, images=images or None))
+                content = promptContent or ""
+            role = message.get("role","user")
+            messages.append(Message(role=role, content=content, images=images or None))
         
         if tools is not None:
             toolList = self._parse_tool(tools)
@@ -89,16 +91,22 @@ class BaseChatService(ABC):
     ) -> list[Tool]:
         tools = []
         for tool in tool_list:
+            functions = tool.get("function")
+            if functions is None:
+                continue
+            parameters = functions.get("parameters")
+            if parameters is None:
+                continue
             tools.append(
                 Tool(
-                    type=tool.type,
+                    type=tool.get("type","function"),
                     function=Function(
-                        name=tool.function.name,
-                        description=tool.function.description,
+                        name=functions.get("name"),
+                        description=functions.get("description"),
                         parameters=Parameters(
-                            type=tool.function.parameters.get("type","object"),
-                            properties=tool.function.parameters.get("properties",{}),
-                            required=tool.function.parameters.get("required",[])
+                            type=parameters.get("type","object"),
+                            properties=parameters.get("properties",{}),
+                            required=parameters.get("required",[])
                         )
                     ) 
                 )
@@ -119,17 +127,18 @@ class BaseChatService(ABC):
         tool_calls: list[ToolCall]
     ) -> list[ChatCompletionMessageToolCall]:
         tools:list[ChatCompletionMessageToolCall] = []
-        for tool in tool_calls:
-            tools.append(
-                ChatCompletionMessageToolCall(
-                    id=uuid4().hex,
-                    function=FunctionParam(
-                        arguments=str(tool.function.arguments),
-                        name=tool.function.name
-                    ),
-                    type="function"
+        if tool_calls is not None:
+            for tool in tool_calls:
+                tools.append(
+                    ChatCompletionMessageToolCall(
+                        id=uuid4().hex,
+                        function=FunctionParam(
+                            arguments=str(tool.function.arguments),
+                            name=tool.function.name
+                        ),
+                        type="function"
+                    )
                 )
-            )
         return tools
 
     def _parse_message(
@@ -148,6 +157,7 @@ class BaseChatService(ABC):
                 )
             )
         )
+        return choices
 
     def _parse_response(self, response:ChatResponse) -> ChatCompletion:
         return ChatCompletion(
