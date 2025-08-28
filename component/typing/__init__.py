@@ -177,41 +177,18 @@ class BaseChatService(ABC):
     def chat(self, prompt:list[ChatCompletionMessageParam], tools:list[ChatCompletionToolParam] | None = None) -> ChatCompletion:
         pass
 
-class InputDataObject(BaseModel):
-    points:list[list[float]]
-    polygonlabels:list[str]
-    original_width:int
-    original_height:int
+class SerpApiConfig(BaseModel):
+    q:str
+    api_key:str
+    hl:str = 'zh-tw'
+    gl:str = 'tw'
+    num: int = 10
+    location: str = 'Taiwan'
 
-class InputData(BaseModel):
-    ocr:str
-    id: int
-    label: list[InputDataObject] | None = None
-    transcription:str | list[str] | None = None
-    shape:str
-    scoreline:str
-    annotator: str
-    annotation_id:int
-    created_at: str
-    updated_at: str
-    lead_time: float
+class SerpResult(BaseModel):
+    title:str
+    link:str
+    snippet:str
+    position:int
 
-    @classmethod
-    def from_json(cls, data:dict | str):
-        if isinstance(data, str):
-            data = json.loads(data)
-        transcription = data.get('transcription')
-        if isinstance(transcription, list):
-            temp = []
-            for t in transcription:
-                if isinstance(t, dict):
-                    tlist = t.get('text')
-                    if isinstance(tlist, list):
-                        temp.extend(tlist)
-                    if isinstance(tlist, str):
-                        temp.append(tlist)
-                if isinstance(t, str):
-                    temp.append(t)
-            data['transcription'] = temp   
-        return cls(**data)
-    
+searchResultType = list[SerpResult]
