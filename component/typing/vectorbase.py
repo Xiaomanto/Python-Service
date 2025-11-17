@@ -55,19 +55,19 @@ class BaseVectorService(ABC):
     
     def connect(self):
         """
-        Connect to the vector database
+        Connect to the vector collection
         """
         pass
     
     def insert(self, data: dict, collection_name: str):
         """
-        Insert data into the vector database
+        Insert data into the vector collection
         """
         pass
     
     def search_knowledge(self, query: str, collection_name: str, mode: Literal["bm25", "similarity", "multi"]="multi", limit: int=3) -> list[Document]:
         """
-        Search the vector database
+        Search the vector collection
         Args:
             query: The query to search for
             collection_name: The name of the collection to search in
@@ -81,30 +81,30 @@ class BaseVectorService(ABC):
     
     def update(self, data: dict):
         """
-        Update data in the vector database
+        Update data in the vector collection
         """
         pass
     
     def delete(self, uid: str):
         """
-        Delete data from the vector database by uuid
+        Delete data from the vector collection by uuid
         """
         pass
     
-    def create_database(self, name: str):
+    def create_collection(self, name: str):
         """
-        Create a new database
-        """
-        pass
-    
-    def delete_database(self, name: str):
-        """
-        Delete a database
+        Create a new collection
         """
         pass
     
-    def list_databases(self) -> list[str]:
+    def delete_collection(self, name: str):
         """
-        List all databases
+        Delete a collection
+        """
+        pass
+    
+    def list_collections(self) -> list[str]:
+        """
+        List all collections
         """
         pass

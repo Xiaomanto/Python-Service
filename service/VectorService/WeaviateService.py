@@ -18,9 +18,9 @@ class WeaviateService(BaseVectorService):
             print("start to recreate database")
             self._backup_data()
             for collection in self.collections:
-                self.delete_database(collection)
+                self.delete_collection(collection)
         for collection in self.collections:
-            self.create_database(collection, exist_ok=True)
+            self.create_collection(collection, exist_ok=True)
         if self.backup_data:
             for collection in self.collections:
                 for item in self.backup_data[collection]:
@@ -102,7 +102,7 @@ class WeaviateService(BaseVectorService):
             raise e
         
     @override
-    def create_database(self, name: str, exist_ok: bool=False):
+    def create_collection(self, name: str, exist_ok: bool=False):
         try:
             with self.connect() as conn:
                 conn.collections.create(
@@ -122,7 +122,7 @@ class WeaviateService(BaseVectorService):
             raise e
         
     @override
-    def list_databases(self) -> list[str]:
+    def list_collections(self) -> list[str]:
         try:
             with self.connect() as conn:
                 return [item.name for item in conn.collections.list_all(simple=True).values()]
@@ -131,7 +131,7 @@ class WeaviateService(BaseVectorService):
             raise e
         
     @override
-    def delete_database(self, name: str):
+    def delete_collection(self, name: str):
         try:
             with self.connect() as conn:
                 conn.collections.delete(name)
@@ -170,7 +170,7 @@ class WeaviateService(BaseVectorService):
                     collection = conn.collections.get(collection_name)
                 except Exception as collection_error:
                     # 如果集合不存在，列出所有可用的集合
-                    available_collections = self.list_databases()
+                    available_collections = self.list_collections()
                     error_msg = f"找不到集合 '{collection_name}'。"
                     if available_collections:
                         error_msg += f" 可用的集合有：{', '.join(available_collections)}。"
