@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  weaviate-service:
+    image: cr.weaviate.io/semitechnologies/weaviate:1.33.2
+    ports:
+      - 8080:8080
+      - 50051:50051
+    volumes:
+    - weaviate_backup:/var/lib/weaviate
+    restart: always
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+      CLUSTER_HOSTNAME: 'node1'
+      ENABLE_MODULES: text2vec-ollama,text2vec-openai,text2vec-huggingface
+      TEXT2VEC_OLLAMA_ENABLED: "true"
+      TEXT2VEC_OPENAI_ENABLED: "true"
+      TEXT2VEC_HUGGINGFACE_ENABLED: "true"
+
+volumes:
+  weaviate_backup:

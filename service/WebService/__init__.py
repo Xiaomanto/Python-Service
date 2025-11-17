@@ -6,6 +6,6 @@ class WebService:
     def __init__(self) -> None:
         self.search_engine = SearchFactory().get_search()
     
-    def search(self, query: str, **kwargs) -> searchResultType:
-        result = self.search_engine.search(query, **kwargs)
+    def search_web(self, query: str, *args,**kwargs) -> searchResultType:
+        result = self.search_engine.search_web(query, *args,**kwargs)
         return result

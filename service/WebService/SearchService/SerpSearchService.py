@@ -8,7 +8,7 @@ class SerpSearchService(BaseSearchService):
         super().__init__()
     
     @override
-    def search(self, query: str, limit: int = 10) -> list[SerpResult]:
+    def search_web(self, query: str, limit: int = 10, *args, **kwargs) -> list[SerpResult]:
         params = SerpApiConfig(
             q=query,
             num=limit,

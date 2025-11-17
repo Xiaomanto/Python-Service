@@ -11,5 +11,5 @@ class BaseSearchService(ABC):
         self.api_key = os.getenv("SEARCH_API_KEY")
     
     @abstractmethod
-    def search(self, query: str, limit: int=10) -> searchResultType:
+    def search_web(self, query: str, limit: int=10, *args, **kwargs) -> searchResultType:
         pass

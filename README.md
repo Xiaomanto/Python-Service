@@ -9,11 +9,13 @@
 - 支援多種向量庫，包含：Weaviate 等。
 - 支援多種數據庫，包含：PostgreSQL、MySQL 等。
 - 支援多種 Web 使用，包含：Search、Crawl 等。
+- 支援 Rag 流程快速開發。
 
 ## 日誌
 
  - 2025-08-25: 初始版本，僅支援 LLM 快速開發。
  - 2025-08-28: 新增 Web 模組，僅支援 Google Search (SerpAPI)。
+ - 2025-11-17: 新增 Rag 、 Tool 、 Vector 模組，預建立 Crawl 模組，移動並建立 base Type (fileManager、llm、vector)。
 
 ## 安裝
 
@@ -35,22 +37,44 @@ uv add -r requirements-service.txt
 ### 先在專案主程式或專案跟目錄中建立 config/.env 檔案，並填入以下內容：
 ``` env
 ########## LLM Config ##########
-LLM_URL=http://xxx.xxx.xxx.xxx:12345/v1/
+LLM_URL=your chat llm base url or not use
 # example LLM_URL=http://xxx.xxx.xxx.xxx:12345/v1/
+VLM_URL=your vlm base url or not use
 
-LLM_TYPE=Company
+LLM_TYPE=ollama
+VLM_TYPE=openai
 # example LLM_TYPE=OpenAI
-# Options: OpenAI, Ollama
 
 LLM_API_KEY=your-api-key
+VLM_API_KEY=your-api-key
 # example LLM_API_KEY=sk-proj-xxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-LLM_MODEL=ModelName 
+LLM_MODEL=chat model name
+VLM_MODEL=vision model name
 # example LLM_MODEL=gpt-3.5-turbo
 
 ########## Search Config ##########
-SEARCH_API_KEY=your-api-key
-# only use serpapi api key
+SEARCH_API_KEY=your-serp-api-key
+
+########## Vector Config ##########
+VECTOR_HOST=localhost
+VECTOR_PORT=8080
+VECTOR_DATABASE=Any Name
+VECTOR_NAMESPACE=UUID
+VECTOR_MODEL=model name
+VECTOR_API_KEY=your-api-key
+VECTOR_MODEL_TYPE=huggingface or other embedding model type
+# VECTOR_MODEL_BASE_URL=
+
+########## Other Config ###########
+SOFFICE_PATH=/path/to/your/soffice
+# 一定要有或自行擴充
+```
+
+### 建立環境檔案 ( 當前暫時使用，之後會改 Sql Server )
+``` bash
+mkdir -p config/config.json
+mkdir -p config/database.json
 ```
 
 ### 在你需要使用聊天或其他本模組支援之功能的 Python 檔中引入本模組：
