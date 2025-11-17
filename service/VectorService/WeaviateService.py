@@ -46,14 +46,14 @@ class WeaviateService(BaseVectorService):
             api_endpoint=self.baseUrl
         )
         
-    def _parse_data(self, data: dict):
+    def _parse_data(self, data: Document):
         try:
-            pageNumber = str(data.get("docPage")) or "0"
+            pageNumber = str(data.metadata.get("docPage",0) or 0) or "0"
             return {
-                "name": data.get("labelName") or data.get("imageName") or data.get("tableName") or "No Name",
-                "content": data.get("content") or "No Content",
+                "name": data.metadata.get("labelName") or data.metadata.get("imageName") or data.metadata.get("tableName") or "No Name",
+                "content": data.content,
                 "PageNumber": int(pageNumber if pageNumber.isdigit() else "0"),
-                "docId": data.get("docId")
+                "docId": data.metadata.get("docId")
             }
         except Exception as e:
             print(f"Failed to parse data: {e}")
@@ -141,7 +141,7 @@ class WeaviateService(BaseVectorService):
             raise e
         
     @override
-    def insert(self, data: dict, collection_name: str) -> UUID:
+    def insert(self, data: Document, collection_name: str) -> UUID:
         try:
             with self.connect() as conn:
                 collection = conn.collections.get(collection_name)

@@ -27,6 +27,7 @@ class BaseVectorService(ABC):
         self.table_database_name = "TableCollection"
         self.image_database_name = "ImageCollection"
         self.label_database_name = "LabelCollection"
+        os.environ["OPENAI_API_KEY"] = self.api_key
     
     def _save_config(self, data: dict):
         with open(self.config_path, "w") as f:
@@ -59,7 +60,7 @@ class BaseVectorService(ABC):
         """
         pass
     
-    def insert(self, data: dict, collection_name: str):
+    def insert(self, data: Document, collection_name: str):
         """
         Insert data into the vector collection
         """
