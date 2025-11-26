@@ -13,29 +13,34 @@
 
 ## 日誌
 
- - 2025-08-25: 初始版本，僅支援 LLM 快速開發。
- - 2025-08-28: 新增 Web 模組，僅支援 Google Search (SerpAPI)。
- - 2025-11-17: 新增 Rag 、 Tool 、 Vector 模組，預建立 Crawl 模組，移動並建立 base Type (fileManager、llm、vector)。
+- 2025-08-25: 初始版本，僅支援 LLM 快速開發。
+- 2025-08-28: 新增 Web 模組，僅支援 Google Search (SerpAPI)。
+- 2025-11-17  : 新增 Rag 、 Tool 、 Vector 模組，預建立 Crawl 模組，移動並建立 base Type (fileManager、llm、vector)。
+- 2025-11-26 : 擴充 Vector 支援：Chromadb 、Qdrant。
 
 ## 安裝
 
 ### 在你的專案資料夾中，執行以下指令：
+
 ```bash
 git clone https://github.com/Xiaomanto/Python-Service.git src
 ```
 
 ### 在你的專案根目錄中，安裝環境，請執行它：
-``` bash
+
+```bash
 uv init --bare
 uv venv
 source .venv/bin/activate
 mv src/requirements.txt requirements-service.txt
 uv add -r requirements-service.txt
 ```
+
 ## 使用
 
 ### 先在專案主程式或專案跟目錄中建立 config/.env 檔案，並填入以下內容：
-``` env
+
+```env
 ########## LLM Config ##########
 LLM_URL=your chat llm base url or not use
 # example LLM_URL=http://xxx.xxx.xxx.xxx:12345/v1/
@@ -72,13 +77,15 @@ SOFFICE_PATH=/path/to/your/soffice
 ```
 
 ### 建立環境檔案 ( 當前暫時使用，之後會改 Sql Server )
-``` bash
+
+```bash
 mkdir -p config/config.json
 mkdir -p config/database.json
 ```
 
 ### 在你需要使用聊天或其他本模組支援之功能的 Python 檔中引入本模組：
-``` python
+
+```python
 from src.service import Service
 
 chatService = Service().get_service('chat')

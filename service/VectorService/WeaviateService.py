@@ -25,8 +25,8 @@ class WeaviateService(BaseVectorService):
             for collection in self.collections:
                 for item in self.backup_data[collection]:
                     self.insert(item, collection)
-        self.config["vector_config_type"] = self.model_type
-        self.config["vector_config_model"] = self.model
+        self.config["weaviate"]["vector_config_type"] = self.model_type
+        self.config["weaviate"]["vector_config_model"] = self.model
         self._save_config(self.config)
         print("WeaviateServiceImpl initialized.")
         
@@ -53,7 +53,7 @@ class WeaviateService(BaseVectorService):
                 "name": data.metadata.get("labelName") or data.metadata.get("imageName") or data.metadata.get("tableName") or "No Name",
                 "content": data.content,
                 "PageNumber": int(pageNumber if pageNumber.isdigit() else "0"),
-                "docId": data.metadata.get("docId")
+                "docId": data.docId
             }
         except Exception as e:
             print(f"Failed to parse data: {e}")
@@ -62,11 +62,12 @@ class WeaviateService(BaseVectorService):
     def _parse_result(self, result: Object[WeaviateProperties, None]) -> Document:
         try:
             return Document(
+                docId=UUID(result.properties.get("docId")),
+                pageId=result.uuid,
                 content=result.properties.get("content"), 
                 metadata={
                     "name": result.properties.get("name"), 
-                    "PageNumber": result.properties.get("PageNumber"), 
-                    "docId": result.properties.get("docId")
+                    "PageNumber": result.properties.get("PageNumber")
                 }
             )
         except Exception as e:
@@ -82,7 +83,15 @@ class WeaviateService(BaseVectorService):
                     data[collection] = []
                     try:
                         for item in coll.iterator():
-                            data[collection].append(item.properties)
+                            data[collection].append(Document(
+                                docId=UUID(item.properties.get("docId")),
+                                pageId=item.uuid,
+                                content=item.properties.get("content"),
+                                metadata={
+                                    "name": item.properties.get("name"),
+                                    "PageNumber": item.properties.get("PageNumber")
+                                }
+                            ))
                     except Exception as e:
                         print(f"Failed to get data from collection: {e}")
                         print(f"skip this collection {collection} no data found")
@@ -198,11 +207,11 @@ class WeaviateService(BaseVectorService):
             raise e
     
     @override
-    def update(self, data: dict, collection_name: str, uid: UUID):
+    def update(self, data: Document, collection_name: str):
         try:
             with self.connect() as conn:
                 collection = conn.collections.get(collection_name)
-                collection.data.update(uuid=uid, properties=self._parse_data(data))
+                collection.data.update(uuid=data.pageId, properties=self._parse_data(data))
         except Exception as e:
             print(f"Failed to update data: {e}")
             raise e

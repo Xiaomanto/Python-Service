@@ -116,4 +116,4 @@ class RagService:
             for label in obj.get("labels", []):
                 label["docId"] = doc_id
                 self.vector_service.insert(label, self.vector_service.label_database_name)
-        print(f"inserted {len(objects)} objects to vector database")
+        print(f"inserted {len(objects)} objects to vector collection")

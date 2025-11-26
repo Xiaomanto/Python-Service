@@ -2,15 +2,19 @@ from abc import ABC
 import json
 import os
 from typing import Literal
+from uuid import UUID
 from pydantic import BaseModel
 
 
 class Document(BaseModel):
+    docId: UUID
+    pageId: UUID
     content:str
     metadata: dict
 
 class BaseVectorService(ABC):
     def __init__(self) -> None:
+        self.types = os.getenv("VECTOR_TYPE","weaviate").lower()
         self.host = os.getenv("VECTOR_HOST")
         self.api_key = os.getenv("VECTOR_API_KEY")
         self.port = os.getenv("VECTOR_PORT")
@@ -38,9 +42,12 @@ class BaseVectorService(ABC):
             return True
         with open(self.config_path, "r") as f:
             self.config = json.load(f)
+            if not self.config.get(self.types):
+                self.config[self.types] = {}
+                return False
             return (
-                self.config.get("vector_config_type") != self.model_type
-                or self.config.get("vector_config_model") != self.model
+                self.config.get(self.types,{}).get("vector_config_type") != self.model_type
+                or self.config.get(self.types,{}).get("vector_config_model") != self.model
             )
     
     def _get_headers(self) -> dict | None:
@@ -76,23 +83,23 @@ class BaseVectorService(ABC):
             limit: The limit of the search, default is 3, if used multi mode, the limit is the limit of each mode
         Returns:
             A list of documents
-        can be used database names are [TableCollection, ImageCollection, LabelCollection]
+        can be used collection names are [TableCollection, ImageCollection, LabelCollection]
         """
         pass
     
-    def update(self, data: dict):
+    def update(self, data: Document, collection_name: str):
         """
         Update data in the vector collection
         """
         pass
     
-    def delete(self, uid: str):
+    def delete(self, collection_name: str, uid: UUID):
         """
         Delete data from the vector collection by uuid
         """
         pass
     
-    def create_collection(self, name: str):
+    def create_collection(self, name: str, exist_ok: bool=False):
         """
         Create a new collection
         """
